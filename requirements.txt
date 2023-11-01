@@ -3,3 +3,6 @@ Pillow
 matplotlib
 numpy
 boto3
+torch
+torchvision
+pandas

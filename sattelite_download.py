@@ -43,8 +43,8 @@ def fetch_and_upload_image(date):
     print(f"Uploaded {file_name}")
 
 # Iterate through each day of the past 3 years
-end_date = datetime.datetime.now()- datetime.timedelta(days=2*365)
-start_date = end_date - datetime.timedelta(days=2*365)
+end_date = datetime.datetime.now()
+start_date = end_date - datetime.timedelta(days=4*365)
 
 current_date = start_date
 num_uploaded = 0
