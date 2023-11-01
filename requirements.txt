@@ -1,0 +1,5 @@
+owslib
+Pillow
+matplotlib
+numpy
+boto3
