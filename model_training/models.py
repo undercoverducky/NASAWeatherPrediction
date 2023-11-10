@@ -57,12 +57,12 @@ def save_model(model, id):
     from torch import save
     from os import path
     if isinstance(model, ImageDateRegressionModel):
-        return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), f'model_{id}.th'))
+        return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), f'Model_{id}.th'))
     raise ValueError("model type '%s' not supported!" % str(type(model)))
 
 def load_model(layers, id):
     from torch import load
     from os import path
     r = ImageDateRegressionModel(layers=layers)
-    r.load_state_dict(load(path.join(path.dirname(path.abspath(__file__)), f'model_{id}.th'), map_location='cpu'))
+    r.load_state_dict(load(path.join(path.dirname(path.abspath(__file__)), f'Model_{id}.th'), map_location='cpu'))
     return r

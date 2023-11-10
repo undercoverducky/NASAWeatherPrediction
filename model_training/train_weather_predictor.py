@@ -1,10 +1,9 @@
-from models import ImageDateRegressionModel, save_model, load_model
-from weather_dataset import WeatherDataset, LocalWeatherDataset
+from model_training.models import ImageDateRegressionModel, save_model
+from weather_dataset import LocalWeatherDataset
 from datetime import datetime
 from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 import torch.optim as optim
-import torch.nn.functional as F
 import torch.nn as nn
 import torch
 
@@ -25,7 +24,7 @@ def train(args, device):
     ])
 
     #dataset = WeatherDataset(bucket_name='austin-gibs-images', transform=transform)
-    dataset = LocalWeatherDataset("austin_weather_data/", transform=transform)
+    dataset = LocalWeatherDataset("../austin_weather_data/", transform=transform)
     # Define the sizes for your train, test, and validation sets
     train_size = int(0.7 * len(dataset))  # 70% for training
     test_size = int(0.15 * len(dataset))  # 15% for testing

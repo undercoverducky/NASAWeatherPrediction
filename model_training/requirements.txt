@@ -1,8 +1,7 @@
-owslib
 Pillow
-matplotlib
 numpy
 boto3
 torch
 torchvision
 pandas
+onnx

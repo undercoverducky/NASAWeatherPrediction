@@ -1,4 +1,4 @@
-import models
+from model_training import models
 from owslib.wms import WebMapService
 from io import BytesIO
 from PIL import Image
@@ -9,7 +9,7 @@ import time
 import math
 import torch
 # Read NOAA API Token from a file
-with open('NOAA_api_key.txt', 'r') as file:
+with open('../data_collection/NOAA_api_key.txt', 'r') as file:
     api_token = file.read().strip()
 
 # NOAA CDO URL
@@ -90,8 +90,9 @@ month_sin = math.sin(2 * math.pi * date.month / 12)
 month_cos = math.cos(2 * math.pi * date.month / 12)
 temp_tensor = torch.tensor([daily_high_temp, daily_low_temp], dtype=torch.float32)
 date_tensor = torch.tensor([day_sin, day_cos, month_sin, month_cos], dtype=torch.float32)
-current_time = datetime.now().strftime('%b-%d')
-model = models.load_model([32,64], current_time)
+print(tensor)
+current_time = "Nov-01" #datetime.now().strftime('%b-%d')
+model = models.load_model([32, 64], current_time)
 logits = model(tensor.unsqueeze(0), date_tensor.unsqueeze(0))
 
 pred_high, pred_low = celsius_to_fahrenheit(logits[0][0]), celsius_to_fahrenheit(logits[0][1])

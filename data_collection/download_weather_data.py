@@ -47,7 +47,7 @@ def fetch_data(date, max_retries=3, backoff_factor=2):
 
     raise Exception(f"Failed to fetch data after {max_retries} retries.")
 # CSV file to store data
-csv_file = 'temperature_data.csv'
+csv_file = '../temperature_data.csv'
 
 # Open the CSV file for writing
 with open(csv_file, 'w', newline='') as file:

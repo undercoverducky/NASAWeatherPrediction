@@ -1,5 +1,4 @@
 import datetime
-import matplotlib.pyplot as plt
 from owslib.wms import WebMapService
 import boto3
 from io import BytesIO
@@ -55,4 +54,5 @@ while current_date <= end_date:
     except:
         pass
     current_date += datetime.timedelta(days=1)
+
 print(f"finished uploading {num_uploaded} images")

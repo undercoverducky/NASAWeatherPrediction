@@ -65,7 +65,7 @@ class LocalWeatherDataset(Dataset):
         self.transform = transform
 
         # Read CSV file from local directory
-        self.temperature_data = pd.read_csv(os.path.join(local_dir, 'temperature_data.csv'))
+        self.temperature_data = pd.read_csv(os.path.join(local_dir, '../temperature_data.csv'))
 
         # List all images in the local directory
         self.image_keys = [file for file in os.listdir(local_dir) if file.endswith('.jpg')]
