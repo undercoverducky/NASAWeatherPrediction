@@ -47,6 +47,12 @@ start_date = end_date - datetime.timedelta(days=4*365)
 
 current_date = start_date
 num_uploaded = 0
+
+
+
+
+
+
 while current_date <= end_date:
     try:
         fetch_and_upload_image(current_date)
@@ -55,4 +61,15 @@ while current_date <= end_date:
         pass
     current_date += datetime.timedelta(days=1)
 
+date_strings = ["2020-12-22", "2021-01-28", "2022-10-11", "2022-10-12", "2022-10-13", "2022-10-14", "2022-10-15", "2022-10-16", "2022-10-17", "2022-10-18", "2022-10-19", "2022-10-20", "2022-10-21"]
+
+
+for date_str in date_strings:
+    current_date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+    try:
+        fetch_and_upload_image(current_date)
+        num_uploaded += 1
+    except Exception as e:
+        print(f"{e}")
+        pass
 print(f"finished uploading {num_uploaded} images")
