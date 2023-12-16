@@ -1,5 +1,5 @@
-from models import ImageDateRegressionModel, save_model
-from weather_dataset import LocalWeatherDataset, download_dataset_from_s3
+from models import WeatherSequenceModel, save_model
+from weather_dataset import LocalWeatherSequenceDataset, download_dataset_from_s3
 from datetime import datetime
 from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
@@ -11,11 +11,13 @@ logging.basicConfig(level=logging.INFO)
 
 def train(args, device):
     try:
-        logging.info("Downloading data from s3...")
-        download_dataset_from_s3()
-        logging.info("Downloading data finished.")
-
-        model = ImageDateRegressionModel(layers=[32,64], normalize_input=True).to(device)
+        if args.download:
+            logging.info("Downloading data from s3...")
+            download_dataset_from_s3()
+            logging.info("Downloading data finished.")
+        # seq_len, n_embed, n_attn, num_layers, num_heads, layers=[], n_input_channels=3,
+        seq_len = 20
+        model = WeatherSequenceModel(seq_len, 64, 64, 1, 4,  layers=[32,64]).to(device)
 
         current_time = datetime.now().strftime("%b-%Y")
         logging.info(current_time)
@@ -29,7 +31,7 @@ def train(args, device):
         ])
 
         #dataset = WeatherDataset(bucket_name='austin-gibs-images', transform=transform)
-        dataset = LocalWeatherDataset("./austin_weather_data/", transform=transform)
+        dataset = LocalWeatherSequenceDataset("./austin_weather_data/", seq_len, transform=transform)
         # Define the sizes for your train, test, and validation sets
         train_size = int(0.7 * len(dataset))  # 70% for training
         test_size = int(0.15 * len(dataset))  # 15% for testing
@@ -61,7 +63,7 @@ def train(args, device):
                 if device is not None:
                     batch_x, date_x, batch_y = batch_x.to(device), date_x.to(device), batch_y.to(device)
                 optimizer.zero_grad()
-
+                print(f"{batch_x.shape} {date_x.shape} {batch_y.shape}")
                 logits = model(batch_x, date_x)
                 loss = criterion(logits, batch_y)
                 total_train_loss += loss
@@ -115,15 +117,15 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     # Put custom arguments here
-
+    parser.add_argument('--download', action='store_true', help='If set, download data')
     args = parser.parse_args()
 
     # Set the device
     device = torch.device("cpu")
     if torch.cuda.is_available():
         device = torch.device("cuda")
-    elif torch.backends.mps.is_available():
-        device = torch.device("mps")
+    #elif torch.backends.mps.is_available():
+    #    device = torch.device("mps")
     logging.info(f"Using device: {device}")
 
     train(args, device)
