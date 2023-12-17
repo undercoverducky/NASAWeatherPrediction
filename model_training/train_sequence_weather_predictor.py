@@ -63,7 +63,7 @@ def train(args, device):
                 if device is not None:
                     batch_x, date_x, batch_y = batch_x.to(device), date_x.to(device), batch_y.to(device)
                 optimizer.zero_grad()
-                print(f"{batch_x.shape} {date_x.shape} {batch_y.shape}")
+                #print(f"{batch_x.shape} {date_x.shape} {batch_y.shape}")
                 logits = model(batch_x, date_x)
                 loss = criterion(logits, batch_y)
                 total_train_loss += loss

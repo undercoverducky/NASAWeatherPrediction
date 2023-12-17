@@ -134,7 +134,7 @@ class LocalWeatherSequenceDataset(Dataset):
         self.image_keys = sorted(image_files, key=lambda x: datetime.strptime(x.split('_')[-1].split('.')[0], '%Y-%m-%d'))
 
     def __len__(self):
-        return len(self.image_keys) - self.seq_len + 1
+        return len(self.image_keys) - self.seq_len # subtract 1 to account for using the next day instead of current
 
     def find_closest_temperature(self, target_date):
         max_diff_days = 15  # set a reasonable limit to how far you want to search
@@ -169,6 +169,8 @@ class LocalWeatherSequenceDataset(Dataset):
 
             date_string = image_key.split('_')[-1].split('.')[0]
             date = datetime.strptime(date_string, '%Y-%m-%d')
+            next_day = date + timedelta(days=1)
+            next_day_string = next_day.strftime('%Y-%m-%d')
 
             # Cyclical encoding for date
             day_sin = math.sin(2 * math.pi * date.day / 31)
@@ -176,11 +178,11 @@ class LocalWeatherSequenceDataset(Dataset):
             month_sin = math.sin(2 * math.pi * date.month / 12)
             month_cos = math.cos(2 * math.pi * date.month / 12)
 
-            temperature_row = self.temperature_data[self.temperature_data['Date'] == date_string]
+            temperature_row = self.temperature_data[self.temperature_data['Date'] == next_day_string]
             if temperature_row.empty:
-                temperature_row = self.find_closest_temperature(date)
+                temperature_row = self.find_closest_temperature(next_day)
                 if temperature_row is None:
-                    raise ValueError(f"No close temperature data found for date: {date_string}")
+                    raise ValueError(f"No close temperature data found for date: {next_day_string}")
 
             high_temp = temperature_row['High Temperature (°C)'].values[0]
             low_temp = temperature_row['Low Temperature (°C)'].values[0]
