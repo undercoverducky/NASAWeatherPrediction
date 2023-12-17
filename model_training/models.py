@@ -93,20 +93,20 @@ class WeatherEncoder(nn.Module):
             transform = torchvision.transforms.Normalize(mean=[0.4701, 0.4308, 0.3839], std=[0.2595, 0.2522, 0.2541])
             x = transform(x)
         x = x.transpose(1, 2)
-        print(f"before conv_layers: {x.shape}")
+        #print(f"before conv_layers: {x.shape}")
         x = self.conv_layers(x)
-        print(f"after_conv: {x.shape}")
+        #print(f"after_conv: {x.shape}")
         x = self.gap(x)
-        print(f"after_gap: {x.shape}")
+        #print(f"after_gap: {x.shape}")
         x = x.transpose(1, 2)
         x = x.view(x.size(0), x.size(1), -1)
-        print(f"after_reshape: {x.shape}")
+        #print(f"after_reshape: {x.shape}")
         x = self.relu(self.img_linear(x)) # [B, c] -> [B, 32]
-        print(f"after_img_linear: {x.shape}")
+        #print(f"after_img_linear: {x.shape}")
         date_x = self.relu(self.date_linear(date_feature))
-        print(f"after_date: {date_x.shape}")
+        #print(f"after_date: {date_x.shape}")
         x = torch.cat((x, date_x), dim=2)
-        print(f"after_concat: {x.shape}")
+        #print(f"after_concat: {x.shape}")
         return x
 
 class Head(nn.Module):
@@ -230,12 +230,12 @@ class WeatherSequenceModel(torch.nn.Module):
 
     def forward(self, x, date_feature, batched=False):
         logit = self.weather_encoder(x, date_feature) # B, seq_len, n_embed
-        print(f"after_encoder: {logit.shape}")
+        #print(f"after_encoder: {logit.shape}")
         #logit = self.pos_embedding(logit, batched=batched)
         logit = self.transformer_layers(logit) # B, seq_len, n_embed
-        print(f"after_transformers: {logit.shape}")
+        #print(f"after_transformers: {logit.shape}")
         logit = self.classifier(logit) # B, seq_len, 2 # switch to CLS method
-        print(f"after_classifier: {logit.shape}")
+        #print(f"after_classifier: {logit.shape}")
         if batched:
             return logit
         else:
@@ -246,6 +246,22 @@ def save_model(model, id, device, bucket_name='austin-weather-prediction-models'
         dummy_image = torch.rand((3, 512, 512)).unsqueeze(0).to(device)
         dummy_date = torch.rand((1, 4)).to(device)
         model_filename = f"Model-{id}.onnx"
+        torch.onnx.export(model, args=(dummy_image, dummy_date), f=model_filename,
+                          input_names=['image_tensor', 'date_features'], export_params=True)
+        s3 = boto3.client('s3')
+        try:
+            s3.upload_file(model_filename, bucket_name, model_filename)
+            logging.info(f"Model '{model_filename}' uploaded to S3 bucket '{bucket_name}' successfully.")
+            return True
+        except Exception as e:
+            logging.error(f"Error uploading to s3: {e}")
+    raise ValueError("model type '%s' not supported!" % str(type(model)))
+
+def save_sequential_model(model, id, device, bucket_name='austin-weather-prediction-models'):
+    if isinstance(model, ImageDateRegressionModel):
+        dummy_image = torch.rand((20, 3, 512, 512)).unsqueeze(0).to(device)
+        dummy_date = torch.rand((1, 20, 4)).to(device)
+        model_filename = f"Model-Sequential-{id}.onnx"
         torch.onnx.export(model, args=(dummy_image, dummy_date), f=model_filename,
                           input_names=['image_tensor', 'date_features'], export_params=True)
         s3 = boto3.client('s3')

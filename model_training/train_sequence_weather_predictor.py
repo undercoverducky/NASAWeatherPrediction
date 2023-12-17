@@ -1,4 +1,4 @@
-from models import WeatherSequenceModel, save_model
+from models import WeatherSequenceModel, save_sequential_model
 from weather_dataset import LocalWeatherSequenceDataset, download_dataset_from_s3
 from datetime import datetime
 from torchvision import transforms
@@ -107,7 +107,7 @@ def train(args, device):
                 total_test_loss += loss
         test_loss = total_test_loss / len(test_loader)
         logging.info(f"total_test_loss: {test_loss}")
-        save_model(model, current_time, device)
+        save_sequential_model(model, current_time, device)
     except Exception as e:
         logging.error(f"Training failed with exception {e}")
 
