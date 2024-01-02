@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: manual-collect-weather-metrics
+spec:
+  template:
+    spec:
+      containers:
+        - name: collect-weather-metrics
+          image: undercoverducky/weathermetriccollection:0.0.7-amd64
+          command: [ "python", "/code/collect_metrics.py" ]
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+      restartPolicy: OnFailure
+      nodeSelector:
+        nodegroup: seldon-test-frontend-dev

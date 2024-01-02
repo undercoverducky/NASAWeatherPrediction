@@ -1,0 +1,5 @@
+owslib
+boto3
+requests
+numpy
+Pillow

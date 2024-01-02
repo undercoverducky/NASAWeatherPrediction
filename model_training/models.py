@@ -258,7 +258,7 @@ def save_model(model, id, device, bucket_name='austin-weather-prediction-models'
     raise ValueError("model type '%s' not supported!" % str(type(model)))
 
 def save_sequential_model(model, id, device, bucket_name='austin-weather-prediction-models'):
-    if isinstance(model, ImageDateRegressionModel):
+    if isinstance(model, WeatherSequenceModel):
         dummy_image = torch.rand((20, 3, 512, 512)).unsqueeze(0).to(device)
         dummy_date = torch.rand((1, 20, 4)).to(device)
         model_filename = f"Model-Sequential-{id}.onnx"

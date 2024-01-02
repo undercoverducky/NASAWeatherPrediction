@@ -49,7 +49,7 @@ wms = WebMapService(gibs_url)
 layer = "MODIS_Terra_CorrectedReflectance_TrueColor"
 img_format = "image/jpeg"  # Format of the image to retrieve
 img_size = (512, 512)  # Size of the image (width, height)
-date = datetime.now() - timedelta(days=20)
+date = datetime.now() - timedelta(days=3)
 
 response = wms.getmap(layers=[layer],
                           styles=[''],
